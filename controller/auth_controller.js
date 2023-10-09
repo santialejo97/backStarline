@@ -38,7 +38,7 @@ const register = async (req = express.request, res = express.response) => {
     // ..................................................... //
     //   * Respuesta de la peticion
     const usuario = await db.query(query);
-    delete usuario.password;
+    delete usuario.rows[0].password;
     res.status(200).json({
       ok: true,
       msg: "El usuario fue registrado",
@@ -75,7 +75,7 @@ const login = async (req = express.request, res = express.response) => {
     //   * Inicio Validar la password del usuario
     const validPassword = bcrypt.compareSync(body.password, usuario.password);
     if (!validPassword) {
-      res.status(404).json({
+      return res.status(404).json({
         ok: false,
         msg: "Validar password o email",
       });
@@ -88,11 +88,11 @@ const login = async (req = express.request, res = express.response) => {
       token,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({
       ok: false,
       msg: "Surgio un error interno en el servido validar logs",
     });
+    throw Error(error);
   }
 };
 
