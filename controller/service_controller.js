@@ -40,7 +40,7 @@ const postServices = async (req = express.request, res = express.response) => {
       values: [body.name],
     };
     const data = await db.query(query);
-    res.status(200).json({
+    return res.status(200).json({
       ok: true,
       service: data.rows[0],
     });
@@ -63,12 +63,12 @@ const getService = async (req = express.request, res = express.response) => {
     const data = await db.query(query);
 
     if (data.rows.length == 0) {
-      res.status(404).json({
+      return res.status(404).json({
         ok: false,
         msg: `El servicio con el id ${id} no se encuentra`,
       });
     }
-    res.status(200).json({
+    return res.status(200).json({
       ok: true,
       servicio: data.rows[0],
     });
@@ -86,33 +86,74 @@ const updateServices = async (
   res = express.response
 ) => {
   const { id } = req.params;
-  const query = {
-    text: "SELECT * FROM servicios where id = $1::uuid",
-    values: [id],
-  };
-  const data = await db.query(query);
-
-  if (data.rows.length == 0) {
-    res.status(404).json({
+  const body = req.body;
+  try {
+    const query = {
+      text: "SELECT * FROM servicios where id = $1::uuid",
+      values: [id],
+    };
+    const data = await db.query(query);
+    if (data.rows.length == 0) {
+      return res.status(404).json({
+        ok: false,
+        msg: `El servicio con el id ${id} no se encuentra`,
+      });
+    }
+    const queryUpdate = {
+      text: "UPDATE servicios SET nameservice = $1, descripcion = $2, precio = $3, isactive = $4, created_service = $5, updated_service = $6 WHERE id = $7::uuid",
+      values: [
+        body.name,
+        body.descripcion,
+        body.precio,
+        body.isactive,
+        data.rows[0].created_service,
+        new Date(),
+        id,
+      ],
+    };
+    const dataUpdate = await db.query(queryUpdate);
+    return res.status(200).json({
+      ok: true,
+      msg: "Servicio actualizado correctamente",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
       ok: false,
-      msg: `El servicio con el id ${id} no se encuentra`,
+      msg: "Surgio un error interno en el servido validar logs",
     });
   }
-  ("UPDATE nombre_de_tabla SET columna1 = nuevo_valor1, columna2 = nuevo_valor2 WHERE condición;");
-  const queryInserte = {
-    text: "UPDATE servicios SET nameservice = $1, descripcion = $2, precio = $3, isactive = $4, created_service = $5, updated_service = $6 WHERE id = $1::uuid",
-    values: [
-      id,
-      body.name,
-      body.descripcion,
-      body.precio,
-      body.isactive,
-      data.rows[0].created_service,
-      new Date(),
-    ],
-  };
-  const dataUpdate = await db.query(queryInserte);
-  console.log(dataUpdate);
+};
+const deleteService = async (req = express.request, res = express.response) => {
+  try {
+    const { id } = req.params;
+    const query = {
+      text: "SELECT * FROM servicios where id = $1::uuid",
+      values: [id],
+    };
+    const data = await db.query(query);
+    if (data.rows.length == 0) {
+      return res.status(404).json({
+        ok: false,
+        msg: `El servicio con el id ${id} no se encuentra`,
+      });
+    }
+    const queryDelete = {
+      text: "DELETE FROM servicios WHERE id = $1::uuid",
+      values: [id],
+    };
+    const dataUpdate = await db.query(queryDelete);
+    return res.status(200).json({
+      ok: true,
+      msg: "Servicio eliminado correctamente",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      ok: false,
+      msg: "Surgio un error interno en el servido validar logs",
+    });
+  }
 };
 
 module.exports = {
@@ -120,4 +161,5 @@ module.exports = {
   postServices,
   getService,
   updateServices,
+  deleteService,
 };

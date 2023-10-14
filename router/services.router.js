@@ -4,6 +4,7 @@ const {
   postServices,
   getService,
   updateServices,
+  deleteService,
 } = require("../controller/service_controller");
 const router = express.Router();
 const { validarJwt } = require("../middleware/validarjwt");
@@ -11,6 +12,7 @@ const { validarJwt } = require("../middleware/validarjwt");
 router.get("/listService", validarJwt, services);
 router.post("/createService", validarJwt, postServices);
 router.get("/getService/:id", validarJwt, getService);
-router.post("/updateService/:id", validarJwt, updateServices);
+router.put("/updateService/:id", validarJwt, updateServices);
+router.delete("/deletService/:id", validarJwt, deleteService);
 
 module.exports = router;
