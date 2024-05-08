@@ -7,7 +7,7 @@ const services = async (req = express.request, res = express.response) => {
       text: "SELECT * FROM servicios ",
     };
     const data = await db.query(query);
-    res.status(200).json({
+    return res.status(200).json({
       ok: true,
       data: data.rows,
     });

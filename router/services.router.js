@@ -9,7 +9,7 @@ const {
 const router = express.Router();
 const { validarJwt } = require("../middleware/validarjwt");
 
-router.get("/listService", validarJwt, services);
+router.get("/listService", services);
 router.post("/createService", validarJwt, postServices);
 router.get("/getService/:id", validarJwt, getService);
 router.put("/updateService/:id", validarJwt, updateServices);

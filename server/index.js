@@ -1,5 +1,6 @@
 const express = require("express");
 const auth = require("../router/auth_router.js");
+const contact = require("../router/contact_router.js");
 const service = require("../router/services.router.js");
 const { db } = require("../db/db_postgres.js");
 const dotenv = require("dotenv");
@@ -18,6 +19,7 @@ db.connect()
 app.use(express.json());
 app.use("/auth", auth);
 app.use("/service", service);
+app.use("/contact", contact);
 
 app.listen(4000, () => {
   console.log("estamos en el puesto 4000");

@@ -14,7 +14,7 @@ const register = async (req = express.request, res = express.response) => {
     };
     const data = await db.query(query);
     if (data.rows.length != 0) {
-      res.status(400).json({
+      return res.status(400).json({
         ok: false,
         msg: "El usuario ya existe en DB",
       });
@@ -39,7 +39,7 @@ const register = async (req = express.request, res = express.response) => {
     //   * Respuesta de la peticion
     const usuario = await db.query(query);
     delete usuario.rows[0].password;
-    res.status(200).json({
+    return res.status(200).json({
       ok: true,
       msg: "El usuario fue registrado",
       usuario: usuario.rows[0],
@@ -63,8 +63,9 @@ const login = async (req = express.request, res = express.response) => {
       values: [body.email],
     };
     const data = await db.query(query);
+    console.log(data);
     if (data.rows.length == 0) {
-      res.status(400).json({
+      return res.status(400).json({
         ok: false,
         msg: "Validar password o email",
       });
@@ -82,17 +83,17 @@ const login = async (req = express.request, res = express.response) => {
     }
     const token = createJwt(usuario.id, usuario.email);
     delete usuario.password;
-    res.status(200).json({
+    return res.status(200).json({
       ok: true,
       usuario,
       token,
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       ok: false,
       msg: "Surgio un error interno en el servido validar logs",
     });
-    throw Error(error);
   }
 };
 
@@ -100,7 +101,7 @@ const newJwt = async (req = express.request, res = express.response) => {
   const { id, email } = req.body;
   try {
     const token = createJwt(id, email);
-    res.status(200).json({
+    return res.status(200).json({
       ok: true,
       msg: "Token validado",
       token,
